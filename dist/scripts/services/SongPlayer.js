@@ -1,6 +1,11 @@
 (function() {
     function SongPlayer() {
         var SongPlayer = {};
+
+/**
+*@desc current playing song object in songs array in album
+*@type {Object}
+*/     
         
         var currentSong = null;
         
@@ -28,22 +33,38 @@
                 
             currentSong = song;
         };
-        
+/**
+*@function Songplayer.play
+*@desc Checks whether currently playing song is the same is target song (ex. clicked song). If they are not the same, run setSong to stop the currently playing song and play target song. If they are the same, play target song.
+*@param {Object} song
+*/                
         SongPlayer.play = function(song) { //song = associated song object in songs array, ex. { title: 'Blue', duration: 161.71, audioUrl: 'assets/music/blue' }
-            if (currentSong !== song) {
-                setSong(song);
+            
+/**
+*@function playSong
+*@desc Play song in currentBuzzObject and set playing property of song object to true
+*/                
+            var playSong = function() {
                 currentBuzzObject.play();
                 song.playing = true;
+            }
+            
+            if (currentSong !== song) {
+                setSong(song);
+                playSong();
                 
             } else if (currentSong === song) {
                 if (currentBuzzObject.isPaused()) {
-                    currentBuzzObject.play();
-                    song.playing = true;
+                    playSong();
                 }
             }
         };
-        ;
-        
+
+/**
+*@function Songplayer.pause
+*@desc Pause song in currentBuzzObject and set playing property of song object to false
+*@param {Object} song
+*/     
         SongPlayer.pause = function(song) {
             currentBuzzObject.pause();
             song.playing = false;
@@ -52,6 +73,7 @@
         return SongPlayer;
 
     }
+    
     
     angular
         .module('blocJams')
