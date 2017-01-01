@@ -1,13 +1,13 @@
 (function() {
-    function SongPlayer() {
+    function SongPlayer(Fixtures) {
         var SongPlayer = {};
 
 /**
-*@desc current playing song object in songs array in album
+*@desc Define currentAlbum to be album stored in Fixture service (i.e. albumPicasso)
 *@type {Object}
-*/     
+*/             
         
-        var currentSong = null;
+        var currentAlbum = Fixtures.getAlbum();
         
 /**
 *@desc Buzz object audio file
@@ -23,7 +23,7 @@
         var setSong = function(song) {
             if (currentBuzzObject) {
                 currentBuzzObject.stop();
-                currentSong.playing = null;
+                SongPlayer.currentSong.playing = null;
             }
         
             currentBuzzObject = new buzz.sound(song.audioUrl, {
@@ -31,8 +31,35 @@
                 preload: true
             });
                 
-            currentSong = song;
+            SongPlayer.currentSong = song;
         };
+/**
+*@function getSongIndex
+*@desc Retrieves index of song object in songs Array
+*@param {Object} song
+*/        
+                
+        var getSongIndex = function(song) {
+            return currentAlbum.songs.indexOf(song);
+        };
+        
+/**
+*@desc current playing song object in songs array in album
+*@type {Object}
+*/     
+        
+        SongPlayer.currentSong = null;
+        
+/**
+*@function playSong
+*@desc Play song in currentBuzzObject and set playing property of song object to true
+*@param {Object} song
+*/                
+        var playSong = function(song) {
+            currentBuzzObject.play();
+            song.playing = true;
+        };
+            
 /**
 *@function Songplayer.play
 *@desc Checks whether currently playing song is the same is target song (ex. clicked song). If they are not the same, run setSong to stop the currently playing song and play target song. If they are the same, play target song.
@@ -40,22 +67,15 @@
 */                
         SongPlayer.play = function(song) { //song = associated song object in songs array, ex. { title: 'Blue', duration: 161.71, audioUrl: 'assets/music/blue' }
             
-/**
-*@function playSong
-*@desc Play song in currentBuzzObject and set playing property of song object to true
-*/                
-            var playSong = function() {
-                currentBuzzObject.play();
-                song.playing = true;
-            }
+            song = song || SongPlayer.currentSong;
             
-            if (currentSong !== song) {
+            if (SongPlayer.currentSong !== song) {
                 setSong(song);
-                playSong();
+                playSong(song);
                 
-            } else if (currentSong === song) {
+            } else if (SongPlayer.currentSong === song) {
                 if (currentBuzzObject.isPaused()) {
-                    playSong();
+                    playSong(song);
                 }
             }
         };
@@ -66,8 +86,28 @@
 *@param {Object} song
 */     
         SongPlayer.pause = function(song) {
+            song = song || SongPlayer.currentSong;
             currentBuzzObject.pause();
             song.playing = false;
+        };
+        
+/**
+*@function Songplayer.previous
+*@desc Sets currentSongIndex to be one before the current song index.
+*/     
+        
+        
+        SongPlayer.previous = function() {
+            var currentSongIndex = getSongIndex(SongPlayer.currentSong);
+            currentSongIndex--;
+            
+            if(currentSongIndex < 0) {
+                currentBuzzObject.stop();
+            } else {
+                song = currentAlbum.songs[currentSongIndex];
+                setSong(song);
+                playSong(song);
+            }
         };
         
         return SongPlayer;
