@@ -22,8 +22,7 @@
         
         var setSong = function(song) {
             if (currentBuzzObject) {
-                currentBuzzObject.stop();
-                SongPlayer.currentSong.playing = null;
+                stopSong(SongPlayer.currentSong);
             }
         
             currentBuzzObject = new buzz.sound(song.audioUrl, {
@@ -59,7 +58,18 @@
             currentBuzzObject.play();
             song.playing = true;
         };
-            
+
+/**
+*@function stopSong
+*@desc Stops song in currentBuzzObject and set playing property of song object to null
+*@param {Object} song
+*/                
+        var stopSong = function(song) {
+            currentBuzzObject.stop();
+            song.playing = null;
+        };
+                    
+        
 /**
 *@function Songplayer.play
 *@desc Checks whether currently playing song is the same is target song (ex. clicked song). If they are not the same, run setSong to stop the currently playing song and play target song. If they are the same, play target song.
@@ -102,7 +112,20 @@
             currentSongIndex--;
             
             if(currentSongIndex < 0) {
-                currentBuzzObject.stop();
+                stopSong(SongPlayer.currentSong);
+            } else {
+                song = currentAlbum.songs[currentSongIndex];
+                setSong(song);
+                playSong(song);
+            }
+        };
+        
+        SongPlayer.next = function() {
+            var currentSongIndex = getSongIndex(SongPlayer.currentSong);
+            currentSongIndex++;
+            
+            if(currentSongIndex >= currentAlbum.songs.length) {
+                stopSong(SongPlayer.currentSong);
             } else {
                 song = currentAlbum.songs[currentSongIndex];
                 setSong(song);
