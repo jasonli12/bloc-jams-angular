@@ -31,8 +31,10 @@
             });
             
             currentBuzzObject.bind('timeupdate', function() {
-               $rootScope.$apply(function() {
-                  SongPlayer.currentTime = currentBuzzObject.getTime(); 
+                $rootScope.$apply(function() {
+                SongPlayer.currentTime = currentBuzzObject.getTime();
+                SongPlayer.currentTimeFormatted = buzz.toTimer(SongPlayer.currentTime);
+                   
                });
             });
                 
@@ -72,6 +74,17 @@
                 currentBuzzObject.setTime(time);    
             }
         };
+
+/**
+*@function durationFormatted
+*@desc Converts format of currently playing song duration to mm:ss
+*/        
+        SongPlayer.durationFormatted = function() {
+            if (currentBuzzObject) {
+                return buzz.toTimer(currentBuzzObject.getDuration());
+            }
+        };
+        
         
 /**
 *@desc Current volume of currently playing song
